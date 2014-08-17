@@ -4,6 +4,7 @@ import box2dLight.PointLight;
 import box2dLight.RayHandler;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -25,7 +26,7 @@ public class LdGame extends Game {
 	PointLight spriteLight;
 	Color ambientLight, lightColor;
 	SpriteBatch batch;
-	Texture img;
+	Texture img, tile;
 	
 	@Override
 	public void create () {
@@ -34,7 +35,7 @@ public class LdGame extends Game {
 		spriteCamera.update(true);
 		
 		// setup light colors
-		ambientLight = new Color(0.2f, 0.2f, 0.2f, 1);
+		ambientLight = new Color(0.025f, 0.025f, 0.025f, 1);
 		lightColor = new Color(1, 1, 1, 1);
 		
 		// light camera 
@@ -53,10 +54,11 @@ public class LdGame extends Game {
 		rayHandler.setCombinedMatrix(boxLightCamera.combined);
 		rayHandler.setAmbientLight(ambientLight);
 
-		spriteLight = new PointLight(rayHandler, 128, lightColor, 5, 4, 4);
+		spriteLight = new PointLight(rayHandler, 128*8, lightColor, 5, 4, 4);
 		
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
+		tile = new Texture("tile.png");
 		
 		createWorldScenery();
 	}
@@ -83,13 +85,21 @@ public class LdGame extends Game {
 
 		tileShape.dispose();
 	}
+	
+	double time = 0;
 
 	@Override
-	public void render () {
+	public void render() {
+		// move the light
+		time += Gdx.graphics.getDeltaTime();
+		float x = ((float)Math.sin(time) * 128 + 256) / pixelPerMeter;
+		spriteLight.setPosition(x, 4);
+
 		spriteCamera.update();
 		batch.setProjectionMatrix(spriteCamera.combined);
 		batch.begin();
 		batch.draw(img, 0, 0);
+		batch.draw(tile, 3*64, 2*64);
 		batch.end();
 		
 		boxLightCamera.update();
@@ -100,5 +110,6 @@ public class LdGame extends Game {
 		boxLightCamera.viewportHeight * boxLightCamera.zoom);
 		
 		rayHandler.updateAndRender();
+		
 	}
 }
