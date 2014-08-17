@@ -87,9 +87,19 @@ public class LdGame extends Game {
 	}
 	
 	double time = 0;
+	long lastTime = System.currentTimeMillis();
+	int frames = 0;
 
 	@Override
 	public void render() {
+		// print the FPS
+		long now = System.currentTimeMillis();
+		if (now >= lastTime + 1000) {
+			System.out.println("FPS: " + frames);
+			lastTime = now;
+			frames = 0;
+		}
+		
 		// move the light
 		time += Gdx.graphics.getDeltaTime();
 		float x = ((float)Math.sin(time) * 128 + 256) / pixelPerMeter;
@@ -111,5 +121,6 @@ public class LdGame extends Game {
 		
 		rayHandler.updateAndRender();
 		
+		frames++;
 	}
 }
